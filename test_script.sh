@@ -31,6 +31,7 @@ function test_nc() {
   echo -n "[$1 -> $2:$3] attendu : $4 ... "
   #-v pour avoir plus de détail /-z juste pour voir si le port est ouvert / -w on attend 3sec d'avoir la réponse
   output=$(kathara exec $1 -- nc -vz -w 3 $2 $3 2>&1)
+
   if echo "$output" | grep -q "Connection refused"; then
     GOT="ALLOW"
   elif echo "$output" | grep -q "succeeded"; then
@@ -180,6 +181,7 @@ test_nc "pcaetudiant" "172.16.21.3" "22" "DENY"      # SFTP interdit
 kathara exec rcritique -- iptables -A OUTPUT -j DROP
 # Tester l'accès Internet depuis un réseau critique (doit utiliser un autre routeur)
 test_curl_internet "pcapsoignant" "ALLOW"
+test_curl_internet "rssi" "ALLOW"
 #Rétablir le routeur
 kathara exec rcritique -- iptables -D OUTPUT -j DROP
 
@@ -192,11 +194,26 @@ test_nc "pcavisiteur" "172.16.3.28" "1224" "DENY"  # Interdit pour les visiteurs
 test_ping "pcaetudiant" "172.16.21.4" "DENY"  # AUX ne doit pas être pingable
 test_ssh "rssi" "172.16.21.4" "ALLOW"         # Seul le RSSI peut y accéder
 
+test_nc "pcachercheurs" "172.16.21.3" "3306" "DENY"  # MySQL interdit
+test_nc "pcachercheurs" "172.16.21.3" "22" "ALLOW"   # SFTP autorisé
+
+test_nc "s" "172.16.21.4" "22" "ALLOW"      # SFTP autorisé depuis S
+
+test_ssh "pcaetudiant" "172.16.21.4" "DENY" # SSH interdit pour les étudiants
+
+test_ssh "rssi" "172.16.21.3" "ALLOW"  # Accès DSI -> BDD
+test_ssh "rssi" "172.16.21.2" "ALLOW"  # Accès DSI -> MAIL
+test_ssh "rssi" "172.16.21.4" "ALLOW"  # Accès DSI -> AUX
+test_ssh "rssi" "172.16.21.254" "ALLOW"  # Accès DSI -> Routeur DSI
+
+
+
 echo
 echo "=== RÉSUMÉ DES TESTS ==="
 echo "RÉUSSIS : $PASS_COUNT"
 echo "ÉCHECS : $FAIL_COUNT"
 exit 0
+
 
 
 
