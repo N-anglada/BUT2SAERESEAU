@@ -182,7 +182,10 @@ test_curl_internet "pcapsoignant" "ALLOW"
 #Rétablir le routeur
 kathara exec rcritique -- iptables -D OUTPUT -j DROP
 
-
+# Autoriser uniquement le personnel soignant et la compta
+test_nc "pcapsoignant" "172.16.3.28" "1224" "ALLOW"
+test_nc "pcacomptabilite" "172.16.3.28" "1224" "ALLOW"
+test_nc "pcavisiteur" "172.16.3.28" "1224" "DENY"  # Interdit pour les visiteurs
 
 echo
 echo "=== RÉSUMÉ DES TESTS ==="
