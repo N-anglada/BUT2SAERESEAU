@@ -172,6 +172,18 @@ test_nc "pcaetudiant" "172.16.21.2" "25" "DENY"  # SMTP bloqué
 test_nc "pcachercheurs" "172.16.21.3" "22" "ALLOW"   # SFTP autorisé
 test_nc "pcaetudiant" "172.16.21.3" "22" "DENY"      # SFTP interdit
 
+
+
+
+# Bloquer le trafic sortant du routeur critique
+kathara exec rcritique -- iptables -A OUTPUT -j DROP
+# Tester l'accès Internet depuis un réseau critique (doit utiliser un autre routeur)
+test_curl_internet "pcapsoignant" "ALLOW"
+#Rétablir le routeur
+kathara exec rcritique -- iptables -D OUTPUT -j DROP
+
+
+
 echo
 echo "=== RÉSUMÉ DES TESTS ==="
 echo "RÉUSSIS : $PASS_COUNT"
