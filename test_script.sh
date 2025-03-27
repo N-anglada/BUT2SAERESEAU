@@ -122,24 +122,69 @@ function test_curl_server_s() {
     ((FAIL_COUNT++))
   fi
 }
-#Test sur pc employé
 
+
+#Test sur pc employe
 
 #pour voir ses mails
 test_nc "pcaetudiant" "172.16.21.2" "993" "ALLOW"
-#pour aller sur le site public
+#pour aller sur le site public/intranet
 test_nc "pcaetudiant" "172.16.3.28" "80" "ALLOW"
-#ne peut pas acceder à la bdd
+test_nc "pcaetudiant" "172.16.3.28" "443" "ALLOW"
+#ne peut pas acceder à la bdd/donnee anonymise
 test_nc "pcaetudiant" "172.16.21.3" "3306" "DENY"
+test_nc "pcaetudiant" "172.16.21.3" "22" "DENY"
+#ne peut pas aller sur app rdv
+test_nc "pcaetudiant" "172.16.21.28" "1224" "DENY"
 
 
 #Test sur la machine d'un admin (ici)
 
 
-#peut ping n'importe qui (ici pca ec)
+#peut ping n'importe qui (on test une machine par serveur)
 test_ping "rssi" "172.16.12.2" "ALLOW"
-#peut accéder en ssh à toutes machines (ici pcavisiteur)
+test_ping "rssi" "172.16.3.28" "ALLOW"
+test_ping "rssi" "172.16.24.2" "ALLOW"
+test_ping "rssi" "172.16.20.2" "ALLOW"
+test_ping "rssi" "172.16.4.2" "ALLOW"
+test_ping "rssi" "172.16.12.2" "ALLOW"
+test_ping "rssi" "172.16.16.2" "ALLOW"
+test_ping "rssi" "172.16.8.2" "ALLOW"
+test_ping "rssi" "172.16.22.2" "ALLOW"
+test_ping "rssi" "192.168.0.2" "ALLOW"
+test_ping "rssi" "10.0.100.1" "ALLOW"
+test_ping "rssi" "10.0.100.2" "ALLOW"
+test_ping "rssi" "10.0.100.3" "ALLOW"
+
+test_ping "rssi" "10.0.10.1" "ALLOW"
+test_ping "rssi" "172.16.3.17" "ALLOW"
+test_ping "rssi" "172.16.24.1" "ALLOW"
+test_ping "rssi" "172.16.20.1" "ALLOW"
+test_ping "rssi" "172.16.4.1" "ALLOW"
+test_ping "rssi" "172.16.12.1" "ALLOW"
+test_ping "rssi" "172.16.16.1" "ALLOW"
+test_ping "rssi" "172.16.8.1" "ALLOW"
+test_ping "rssi" "172.16.22.1" "ALLOW"
+test_ping "rssi" "192.168.0.1" "ALLOW"
+#peut accéder en ssh à toutes machines (une machine par serveur)
 test_ssh "rssi" "172.16.22.2" "ALLOW"
+test_ssh "rssi" "172.16.3.29" "ALLOW"
+test_ssh "rssi" "172.16.24.2" "ALLOW"
+test_ssh "rssi" "172.16.20.2" "ALLOW"
+test_ssh "rssi" "172.16.4.2" "ALLOW"
+test_ssh "rssi" "172.16.12.2" "ALLOW"
+test_ssh "rssi" "172.16.8.2" "ALLOW"
+test_ssh "rssi" "192.168.0.2" "ALLOW"
+test_ssh "rssi" "10.0.10.1" "ALLOW"
+test_ssh "rssi" "172.16.3.17" "ALLOW"
+test_ssh "rssi" "172.16.24.1" "ALLOW"
+test_ssh "rssi" "172.16.20.1" "ALLOW"
+test_ssh "rssi" "172.16.4.1" "ALLOW"
+test_ssh "rssi" "172.16.12.1" "ALLOW"
+test_ssh "rssi" "172.16.16.1" "ALLOW"
+test_ssh "rssi" "172.16.8.1" "ALLOW"
+test_ssh "rssi" "172.16.22.1" "ALLOW"
+test_ssh "rssi" "192.168.0.1" "ALLOW"
 #ne peut pas acceder à la bdd (depuis mail)
 test_nc "mail" "172.16.21.3" "3306" "DENY"
 
@@ -151,6 +196,13 @@ test_nc "mail" "172.16.21.3" "3306" "DENY"
 test_nc "s" "172.16.21.4" "22" "ALLOW"
 #on peut atteindre S sur le serveur public depuis un autre sous-réseau
 test_curl_server_s "pcavisiteur" "172.16.3.28" "ALLOW"
+test_curl_server_s "pcasoignant" "172.16.3.28" "ALLOW"
+test_curl_server_s "pcacomptabilite" "172.16.3.28" "ALLOW"
+test_curl_server_s "pcaenseignants" "172.16.3.28" "ALLOW"
+test_curl_server_s "pcaec" "172.16.3.28" "ALLOW"
+test_curl_server_s "pcachercheurs" "172.16.3.28" "ALLOW"
+test_curl_server_s "pcavisiteur" "172.16.3.28" "ALLOW"
+test_curl_server_s "pcapatient" "172.16.3.28" "ALLOW"
 #on ne peut pas ping serveur S depuis une machine hors DSI
 test_ping "pcapatient" "172.16.3.28" "DENY"
 
@@ -167,6 +219,8 @@ test_curl_internet "pcaetudiant" "ALLOW"
 #on test si on a internet depuis le réseau low
 test_curl_internet "pcapsoignant" "ALLOW"
 
+
+#autre test
 
 test_nc "pcavisiteur" "172.16.3.28" "22" "DENY"  # SSH non autorisé
 test_nc "pcaetudiant" "172.16.21.2" "25" "DENY"  # SMTP bloqué
