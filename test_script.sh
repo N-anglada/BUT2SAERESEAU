@@ -166,6 +166,7 @@ test_curl_internet "pcaetudiant" "ALLOW"
 #on test si on a internet depuis le réseau low
 test_curl_internet "pcapsoignant" "ALLOW"
 
+
 test_nc "pcavisiteur" "172.16.3.28" "22" "DENY"  # SSH non autorisé
 test_nc "pcaetudiant" "172.16.21.2" "25" "DENY"  # SMTP bloqué
 
@@ -186,6 +187,10 @@ kathara exec rcritique -- iptables -D OUTPUT -j DROP
 test_nc "pcapsoignant" "172.16.3.28" "1224" "ALLOW"
 test_nc "pcacomptabilite" "172.16.3.28" "1224" "ALLOW"
 test_nc "pcavisiteur" "172.16.3.28" "1224" "DENY"  # Interdit pour les visiteurs
+
+#Test d’Isolation de la Machine AUX
+test_ping "pcaetudiant" "172.16.21.4" "DENY"  # AUX ne doit pas être pingable
+test_ssh "rssi" "172.16.21.4" "ALLOW"         # Seul le RSSI peut y accéder
 
 echo
 echo "=== RÉSUMÉ DES TESTS ==="
