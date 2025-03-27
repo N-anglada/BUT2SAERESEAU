@@ -1,0 +1,22 @@
+ip link set dev eth0 up
+ip addr add 172.16.3.29/28 dev eth0
+ip route add default via 172.16.3.17
+
+iptables -P INPUT DROP
+iptables -P FORWARD DROP
+iptables -P OUTPUT DROP
+
+iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+iptables -A OUTPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+
+# Accepter DNS entrant depuis l’infra (172.16.0.0/12)
+iptables -A INPUT -p udp --dport 53 -j ACCEPT
+iptables -A OUTPUT -p udp --sport 53 -j ACCEPT
+
+#Accepter les pings
+iptables -A INPUT -p icmp -j ACCEPT
+iptables -A OUTPUT -p icmp -j ACCEPT
+
+# Autoriser SSH depuis 172.16.21.0/24 vers port 22
+iptables -A INPUT -p tcp --dport 22 -s 172.16.21.0/24 -j ACCEPT
+
